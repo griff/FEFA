@@ -94,7 +94,7 @@ in {
         smtpd_client_restrictions = [
           "permit_mynetworks"
           "permit_sasl_authenticated"
-          "reject_unknown_reverse_client_hostname" # reject when no reverse PTR
+          #"reject_unknown_reverse_client_hostname" # reject when no reverse PTR
         ];
         smtpd_helo_required = "yes";
         smtpd_helo_restrictions = [
