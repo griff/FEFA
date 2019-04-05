@@ -28,7 +28,7 @@ let
         };
         selector = mkOption {
           type = types.str;
-          default = "dkim";
+          default = "mail";
           description = ''
             DKIM selector to use for this domain
           '';
