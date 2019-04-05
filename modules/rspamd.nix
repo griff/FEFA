@@ -31,7 +31,7 @@ in {
   config = mkIf (cfg.enable && cfg.rspamd.enable) {
     services.rspamd = {
       enable = true;
-      debug = true;
+      debug = cfg.debug;
       extraConfig = ''
 
       '';
