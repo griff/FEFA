@@ -38,7 +38,8 @@ in {
       mapFiles."header_checks_outgoing" = pkgs.writeText "header_checks_outgoing" checksOutgoing;
       mapFiles."header_checks_incoming" = pkgs.writeText "header_checks_incoming" checksIncoming;
       mapFiles."tls_policy" = pkgs.writeText "tls_policy"
-        (mapAttrsToList (n: d: "[${d.backend}] may") cfg.domains);
+        (concatStringsSep "\n"
+          (mapAttrsToList (n: d: "[${d.backend}] may") cfg.domains));
 
       transport = concatStringsSep "\n" (mapAttrsToList (n: d: "${d.domain} smtp:[${d.backend}]") cfg.domains);
 
