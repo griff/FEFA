@@ -122,9 +122,15 @@ in {
           Use Redis backend for Rspamd
         '';
       };
+      enableWebUI = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Enable the Rspamd Web UI
+        '';
+      };
       webUIPassword = mkOption {
         type = types.str;
-        default = "supersecret";
         description = ''
           Password for accessing controller WebUI.
           This can be encrypted with <literal>rspamadm pw</literal>.

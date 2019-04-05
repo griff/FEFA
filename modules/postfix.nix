@@ -7,6 +7,7 @@ let
   checksOutgoing = lib.concatMapStringsSep "\n" (x: "${x.pattern} ${x.action}") (excludeDirection "incoming");
 in {
   config = mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts = [ 25 ];
     services.postfix = {
       enable = true;
       enableHeaderChecks = true;

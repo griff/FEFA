@@ -93,8 +93,9 @@ in {
         extraConfig = ''
           static_dir = "''${WWWDIR}";
           secure_ip = null;
+        '' + (optionalString cfg.rspamd.enableWebUI ''
           password = "${cfg.rspamd.webUIPassword}";
-        '';
+        '');
         includes = [];
       };
 

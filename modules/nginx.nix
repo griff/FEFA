@@ -4,9 +4,10 @@ let
   cfg = config.fefa;
 in {
   config = mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts = [ 80 443 ];
     services.nginx = {
       enable = true;
-      upstreams.rspamd = mkIf cfg.rspamd.enable {
+      upstreams.rspamd = mkIf (cfg.rspamd.enable && cfg.rspamd.enableWebUI) {
         servers."unix:/run/rspamd/worker-controller.sock" = {};
       };
       recommendedProxySettings = true;
@@ -15,7 +16,7 @@ in {
         serverName = cfg.fqdn;
         forceSSL = true;
         enableACME = true;
-        locations."/".proxyPass = mkIf cfg.rspamd.enable "http://rspamd";
+        locations."/".proxyPass = mkIf (cfg.rspamd.enable && cfg.rspamd.enableWebUI) "http://rspamd";
       };
     };
 
