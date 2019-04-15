@@ -10,6 +10,8 @@ in
       extraConfig = mkIf (cfg.dnsForwarder != "") ''
         modules = { 'policy' }
         policy.add(policy.all(policy.STUB('${cfg.dnsForwarder}')))
+        modules = { 'hints > iterate' }
+        hints.add_hosts()
       '';
     };
     networking.nameservers = if cfg.localDnsResolver
