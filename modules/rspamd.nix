@@ -62,19 +62,20 @@ in {
         "options.conf".text = ''
           local_addrs = "${concatStringsSep ", " local_ips}";
         '';
+      };
+      overrides = {
         "greylist.conf".text = ''
           whitelisted_ip {
-            name = "Whitelisted IPs";
             urls = [
+              "$LOCAL_CONFDIR/local.d/greylist-whitelist-ips.inc",
               "sign+key=f7m4jxua6iwtw5966bhfhxqw6xid758nn6putwb51gum9gmzbeqy+https://whitelist.maven-group.org/lists/combined_ip"
-
             ];
             poll_time = 7d;
           }
 
-          whitelist_domains_url {
-            name = "Whitelisted Domains";
+          whitelist_domains_url = {
             urls = [
+              "$LOCAL_CONFDIR/local.d/greylist-whitelist-domains.inc",
               "sign+key=f7m4jxua6iwtw5966bhfhxqw6xid758nn6putwb51gum9gmzbeqy+https://whitelist.maven-group.org/lists/combined_rspamd_domains"
             ];
             poll_time = 7d;
