@@ -110,10 +110,13 @@ in {
           "reject_unknown_sender_domain"    # prevents spam
           "reject_unknown_recipient_domain" # prevents spam
           "reject_unauth_pipelining"        # prevent bulk mail spam
+          "reject_unverified_recipient"
           "permit_sasl_authenticated"
           "permit_mynetworks"
           "reject_unauth_destination"
         ] ++ lib.optional cfg.enableSPFPolicy "check_policy_service unix:private/policydspf"; # policyd-spf
+        unverified_recipient_reject_reason = "Address lookup failed";
+        # unverified_recipient_reject_code = "550";
       } /*// lib.optionalAttrs cfg.enableDKIM {
         smtpd_milters = [ "unix:/run/opendkim/opendkim.sock" ];
         non_smtpd_milters = [ "unix:/run/opendkim/opendkim.sock" ];
