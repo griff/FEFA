@@ -56,6 +56,7 @@ in {
         smtpd_tls_auth_only = "yes";
         # Log only a summary message on TLS handshake completion
         smtpd_tls_loglevel = "1";
+        smtp_tls_loglevel = "1";
 
         smtp_tls_security_level = if cfg.enforceTLS then "encrypt" else "may";
         smtp_tls_policy_maps = "hash:/etc/postfix/tls_policy";
