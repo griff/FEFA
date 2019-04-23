@@ -57,7 +57,7 @@ in {
         # Log only a summary message on TLS handshake completion
         smtpd_tls_loglevel = "1";
 
-        smtp_tls_security_level = mkIf cfg.enforceTLS "verify";
+        smtp_tls_security_level = if cfg.enforceTLS then "encrypt" else "may";
         smtp_tls_policy_maps = "hash:/etc/postfix/tls_policy";
 
 
@@ -65,6 +65,8 @@ in {
         # https://serverfault.com/questions/744168/how-to-disable-rc4-on-postfix
         smtpd_tls_exclude_ciphers = "RC4, aNULL";
         smtp_tls_exclude_ciphers = "RC4, aNULL";
+        tls_preempt_cipherlist = true;
+        tls_medium_cipherlist = "ECDSA+AESGCM:ECDH+AESGCM:DH+AESGCM:ECDSA+AES:ECDH+AES:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS";
         smtpd_tls_received_header = true;
 
         message_size_limit = "100480000";
