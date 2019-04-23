@@ -112,9 +112,9 @@ in {
           "reject_unknown_sender_domain"    # prevents spam
           "reject_unknown_recipient_domain" # prevents spam
           "reject_unauth_pipelining"        # prevent bulk mail spam
-          "reject_unverified_recipient"
           "permit_sasl_authenticated"
           "permit_mynetworks"
+          "reject_unverified_recipient"
           "reject_unauth_destination"
         ] ++ lib.optional cfg.enableSPFPolicy "check_policy_service unix:private/policydspf"; # policyd-spf
         unverified_recipient_reject_reason = "Address lookup failed";
