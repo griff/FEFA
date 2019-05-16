@@ -88,7 +88,6 @@ in {
     };
     localMailRecipient = mkOption {
       type = types.str;
-      default = cfg.monitorMailAddress;
       description = ''
         Who should receive locally generated mails.
       '';
@@ -204,4 +203,5 @@ in {
       '';
     };
   };
+  config.fefa.localMailRecipient = mkIf cfg.enable (mkDefault cfg.monitorMailAddress);
 }
