@@ -47,6 +47,11 @@ in {
       rootAlias = cfg.localMailRecipient;
 
       config = {
+        #
+        #debug_peer_list = "192.168.10.1";
+        # Disable Chunking/BDAT
+        smtpd_discard_ehlo_keywords = mkIf cfg.enableChunking "chunking";
+
         # TLS settings, inspired by https://github.com/jeaye/nix-files
         # Submission by mail clients is handled in submissionOptions
         smtpd_tls_security_level = "may";

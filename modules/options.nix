@@ -145,6 +145,14 @@ in {
         '';
       };
     };
+    enableChunking = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Enable support for Chunking/BDAT.
+        <link xlink:href="http://www.postfix.org/BDAT_README.html"/>
+      '';
+    };
     enableVirusScanning = mkOption {
       type = types.bool;
       default = false;
@@ -158,7 +166,7 @@ in {
       description = ''
         A community effort to develop and maintain a C library for producing
         DKIM-aware applications and an open source milter for providing DKIM
-        servicei (<link xlink:href="http://opendkim.org/"/>).
+        service (<link xlink:href="http://opendkim.org/"/>).
       '';
     };
     enableSPFPolicy = mkOption {
