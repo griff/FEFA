@@ -144,6 +144,14 @@ in {
           This can be encrypted with <literal>rspamadm pw</literal>.
         '';
       };
+      historyRows = mkOption {
+        type = types.int;
+        default = 200;
+        description = ''
+          Number of rows to keep in WebUI history.
+          This is only used when redis is enabled.
+        '';
+      };
     };
     enableChunking = mkOption {
       type = types.bool;

@@ -62,6 +62,10 @@ in {
         "options.conf".text = ''
           local_addrs = "${concatStringsSep ", " local_ips}";
         '';
+        "history_redis.conf" = mkIf cfg.rspamd.enableRedis { text = ''
+            nrows = ${toString cfg.rspamd.historyRows};
+          '';
+        };
       };
       overrides = {
         "greylist.conf".text = ''
