@@ -110,7 +110,7 @@ in {
           "permit_sasl_authenticated"
           "reject_invalid_helo_hostname"
           "reject_non_fqdn_helo_hostname"
-          "reject_unknown_helo_hostname"
+          #"reject_unknown_helo_hostname"
         ];
 
         # Add some security
