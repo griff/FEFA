@@ -50,7 +50,7 @@ in {
         #
         #debug_peer_list = "192.168.10.1";
         # Disable Chunking/BDAT
-        smtpd_discard_ehlo_keywords = mkIf cfg.enableChunking "chunking";
+        smtpd_discard_ehlo_keywords = mkIf (!cfg.enableChunking) "chunking";
 
         # TLS settings, inspired by https://github.com/jeaye/nix-files
         # Submission by mail clients is handled in submissionOptions
