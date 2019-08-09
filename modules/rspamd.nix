@@ -66,6 +66,9 @@ in {
             nrows = ${toString cfg.rspamd.historyRows};
           '';
         };
+        "logging.inc".text = ''
+          facility = "mail";
+        '';
       };
       overrides = {
         "greylist.conf".text = ''
