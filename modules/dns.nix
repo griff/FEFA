@@ -7,9 +7,12 @@ in
   config = mkIf (cfg.enable && (cfg.localDnsResolver || (cfg.dnsForwarder != ""))) {
     services.kresd = mkIf cfg.localDnsResolver {
       enable = true;
-      extraConfig = mkIf (cfg.dnsForwarder != "") ''
+      extraConfig = if (cfg.dnsForwarder != "") then ''
         modules = { 'policy' }
         policy.add(policy.all(policy.STUB('${cfg.dnsForwarder}')))
+        modules = { 'hints > iterate' }
+        hints.add_hosts()
+      '' else ''
         modules = { 'hints > iterate' }
         hints.add_hosts()
       '';
