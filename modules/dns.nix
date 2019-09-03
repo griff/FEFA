@@ -5,6 +5,7 @@ let
 in
 {
   config = mkIf (cfg.enable && (cfg.localDnsResolver || (cfg.dnsForwarder != ""))) {
+    /*
     services.kresd = mkIf cfg.localDnsResolver {
       enable = true;
       extraConfig = if (cfg.dnsForwarder != "") then ''
@@ -16,6 +17,11 @@ in
         modules = { 'hints > iterate' }
         hints.add_hosts()
       '';
+    };
+    */
+    services.unbound = mkIf cfg.localDnsResolver {
+      enable = true;
+      forwardAddresses = mkIf (cfg.dnsForwarder != "") [cfg.dnsForwarder];
     };
     networking.nameservers = if cfg.localDnsResolver
       then ["127.0.0.1"]
