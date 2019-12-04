@@ -114,6 +114,15 @@ in {
         This forces TLS for all outgoing mails
       '';
     };
+    unencryptedSubjects = mkOption {
+      type = types.listOf types.str;
+      description = ''
+        Subject blocks that is used to send messages without TLS.
+        This mostly exists to get around <code>enforceTLS</code> option.
+      '';
+      example = ["ukrypteret" "unencrypted"];
+      default = ["ukrypteret" "unencrypted"];
+    };
     rspamd = {
       enable = mkOption {
         type = types.bool;

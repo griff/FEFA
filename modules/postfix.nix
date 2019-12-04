@@ -17,7 +17,15 @@ in {
            "-o" "smtp_header_checks=header_checks_incoming"
           ];
         };
-      } // lib.optionalAttrs cfg.enableSPFPolicy {
+      } // optionalAttrs cfg.enforceTLS {
+        smtp_notls = {
+          command = "smtp";
+          args = [
+            "-o" "smtp_tls_security_level=may"
+            "-o" "header_checks="
+          ];
+        };
+      } // optionalAttrs cfg.enableSPFPolicy {
         policydspf = {
           command = "spawn";
           args = [ "user=nobody" "argv=${pkgs.python36Packages.pypolicyd-spf}/bin/policyd-spf" ];
@@ -25,6 +33,9 @@ in {
           maxproc = 0;
         };
       };
+      extraHeaderChecks = optionalString cfg.enforceTLS (concatStringsSep "\n" (map (subject: ''
+        /^Subject: .*\[${subject}\].*/ FILTER smtp_notls:
+      '') cfg.unencryptedSubjects));
       setSendmail = true;
       hostname = cfg.fqdn;
       destination = [
