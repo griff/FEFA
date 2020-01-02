@@ -69,6 +69,7 @@ in {
         smtpd_tls_security_level = "may";
         # strong might suffice and is computationally less expensive
         smtpd_tls_eecdh_grade = "ultra";
+        smtpd_tls_dh1024_param_file = "${../ffdhe3072.pem}";
         # Allowing AUTH on a non encrypted connection poses a security risk
         smtpd_tls_auth_only = "yes";
         # Log only a summary message on TLS handshake completion
@@ -77,12 +78,14 @@ in {
 
         smtp_tls_security_level = if cfg.enforceTLS then "encrypt" else "may";
         smtp_tls_policy_maps = "hash:/etc/postfix/tls_policy";
-
+        smtpd_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
+        smtpd_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
 
         # Disable weak ciphers as reported by https://ssl-tools.net
         # https://serverfault.com/questions/744168/how-to-disable-rc4-on-postfix
         smtpd_tls_exclude_ciphers = "RC4, aNULL";
         smtp_tls_exclude_ciphers = "RC4, aNULL";
+        tls_ssl_options="NO_RENEGOTIATION";
         tls_preempt_cipherlist = true;
         tls_medium_cipherlist = "ECDSA+AESGCM:ECDH+AESGCM:DH+AESGCM:ECDSA+AES:ECDH+AES:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS";
         smtpd_tls_received_header = true;
