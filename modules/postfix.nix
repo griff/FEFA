@@ -7,7 +7,7 @@ let
   checksOutgoing = lib.concatMapStringsSep "\n" (x: "${x.pattern} ${x.action}") (excludeDirection "incoming");
 in {
   config = mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = [ 25 ];
+    networking.firewall.allowedTCPPorts = [ 25 587 ];
     services.postfix = {
       enable = true;
       enableHeaderChecks = true;
@@ -15,6 +15,7 @@ in {
         smtp_inet = {
           args = [
            "-o" "smtp_header_checks=header_checks_incoming"
+           "-o" "header_checks="
           ];
         };
       } // optionalAttrs cfg.enforceTLS {
@@ -143,6 +144,17 @@ in {
       sslCert = "/var/lib/acme/${cfg.fqdn}/fullchain.pem";
       sslKey  = "/var/lib/acme/${cfg.fqdn}/key.pem";
       sslCACert = "/etc/ssl/certs/ca-certificates.crt";
+      enableSubmission = true;
+      submissionOptions = {
+        smtpd_tls_security_level = "may";
+        smtpd_tls_auth_only = "yes";
+        smtpd_sasl_auth_enable = "no";
+        #smtpd_sasl_auth_enable = "yes";
+        #smtpd_sasl_security_options = "noanonymous,noplaintext";
+        #smtpd_sasl_tls_security_options = "noanonymous";
+        smtpd_client_restrictions = "permit_mynetworks,permit_sasl_authenticated,reject";
+        #milter_macro_daemon_name = "ORIGINATING";
+      };
     };
     systemd.services.postfix.restartTriggers = [config.environment.etc."ssl/certs/ca-certificates.crt".source];
   };
