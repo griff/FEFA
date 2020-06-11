@@ -15,7 +15,15 @@ in {
         smtp_inet = {
           args = [
            "-o" "smtp_header_checks=header_checks_incoming"
-           "-o" "header_checks="
+          ];
+        };
+        msa_cleanup = {
+          command = "cleanup";
+          private = false;
+          maxproc = 0;
+          args = [
+            "-o" "header_checks=$msa_header_checks"
+            "-o" "body_checks=$msa_body_checks"
           ];
         };
       } // optionalAttrs cfg.enforceTLS {
@@ -23,7 +31,6 @@ in {
           command = "smtp";
           args = [
             "-o" "smtp_tls_security_level=may"
-            "-o" "header_checks="
           ];
         };
       } // optionalAttrs cfg.enableSPFPolicy {
@@ -34,9 +41,11 @@ in {
           maxproc = 0;
         };
       };
-      extraHeaderChecks = optionalString cfg.enforceTLS (concatStringsSep "\n" (map (subject: ''
-        /^Subject: .*\[${subject}\].*/ FILTER smtp_notls:
-      '') cfg.unencryptedSubjects));
+      mapFiles."msa_body_checks" = pkgs.writeText "msa_body_checks" "";
+      mapFiles."msa_header_checks" = pkgs.writeText "msa_header_checks"
+        (optionalString cfg.enforceTLS (concatStringsSep "\n" (map (subject:
+            "/^Subject: .*\[${subject}\].*/ FILTER smtp_notls:"
+          ) cfg.unencryptedSubjects)));
       setSendmail = true;
       hostname = cfg.fqdn;
       destination = [
@@ -63,6 +72,10 @@ in {
         #debug_peer_list = "192.168.10.1";
         # Disable Chunking/BDAT
         smtpd_discard_ehlo_keywords = mkIf (!cfg.enableChunking) "chunking";
+
+        msa_cleanup_service_name = "msa_cleanup";
+        msa_header_checks = "pcre:/etc/postfix/msa_header_checks";
+        msa_body_checks = "pcre:/etc/postfix/msa_body_checks";
 
         # TLS settings, inspired by https://github.com/jeaye/nix-files
         # Submission by mail clients is handled in submissionOptions
@@ -157,6 +170,7 @@ in {
         #smtpd_sasl_tls_security_options = "noanonymous";
         smtpd_client_restrictions = "permit_mynetworks,permit_sasl_authenticated,reject";
         #milter_macro_daemon_name = "ORIGINATING";
+        cleanup_service_name = "$msa_cleanup_service_name";
       };
     };
     systemd.services.postfix.restartTriggers = [config.environment.etc."ssl/certs/ca-certificates.crt".source];
