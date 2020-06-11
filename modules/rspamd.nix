@@ -91,7 +91,7 @@ in {
       };
 
       workers.rspamd_proxy = {
-        type = "proxy";
+        type = "rspamd_proxy";
         bindSockets = [{
           socket = "/run/rspamd/rspamd-milter.sock";
           owner = "rspamd";

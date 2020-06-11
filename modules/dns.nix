@@ -22,6 +22,10 @@ in
     services.unbound = mkIf cfg.localDnsResolver {
       enable = true;
       forwardAddresses = mkIf (cfg.dnsForwarder != "") [cfg.dnsForwarder];
+      #extraConfig = ''
+      #  server:
+      #    val-permissive-mode: yes
+      #'';
     };
     networking.nameservers = if cfg.localDnsResolver
       then ["127.0.0.1"]
