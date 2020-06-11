@@ -91,8 +91,10 @@ in {
 
         smtp_tls_security_level = if cfg.enforceTLS then "encrypt" else "may";
         smtp_tls_policy_maps = "hash:/etc/postfix/tls_policy";
-        smtpd_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
-        smtpd_tls_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
+        smtpd_tls_mandatory_protocols = "!SSLv2, !SSLv3";
+        smtpd_tls_protocols = "!SSLv2, !SSLv3";
+        smtp_tls_mandatory_protocols = "!SSLv2, !SSLv3, !TLSv1, !TLSv1.1";
+        smtp_tls_protocols = "!SSLv2, !SSLv3";
 
         # Disable weak ciphers as reported by https://ssl-tools.net
         # https://serverfault.com/questions/744168/how-to-disable-rc4-on-postfix
