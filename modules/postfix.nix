@@ -89,6 +89,13 @@ in {
         smtpd_tls_loglevel = "1";
         smtp_tls_loglevel = "1";
 
+        smtp_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
+        smtpd_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
+        smtpd_tls_chain_files = [
+          "/var/lib/acme/${cfg.fqdn}/full.pem"
+          "/var/lib/acme/${cfg.fqdn}-ec384/full.pem"
+        ];
+
         smtp_tls_security_level = if cfg.enforceTLS then "encrypt" else "may";
         smtp_tls_policy_maps = "hash:/etc/postfix/tls_policy";
         smtpd_tls_mandatory_protocols = "!SSLv2, !SSLv3";
@@ -159,9 +166,9 @@ in {
         smtpd_milters = [ "unix:/run/opendkim/opendkim.sock" ];
         non_smtpd_milters = [ "unix:/run/opendkim/opendkim.sock" ];
       }*/;
-      sslCert = "/var/lib/acme/${cfg.fqdn}/fullchain.pem";
-      sslKey  = "/var/lib/acme/${cfg.fqdn}/key.pem";
-      sslCACert = "/etc/ssl/certs/ca-certificates.crt";
+      #sslCert = "/var/lib/acme/${cfg.fqdn}/fullchain.pem";
+      #sslKey  = "/var/lib/acme/${cfg.fqdn}/key.pem";
+      #sslCACert = "/etc/ssl/certs/ca-certificates.crt";
       enableSubmission = true;
       submissionOptions = {
         smtpd_tls_security_level = "may";

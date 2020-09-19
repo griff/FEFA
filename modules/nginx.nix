@@ -25,6 +25,16 @@ in {
       postRun = ''
         systemctl reload postfix
       '';
+      keyType = "rsa4096";
+    };
+    security.acme.certs."${cfg.fqdn}-ec384" = {
+      domain = cfg.fqdn;
+      keyType = "ec384";
+      email = cfg.monitorMailAddress;
+      webroot = "/var/lib/acme/acme-challenge";
+      postRun = ''
+        systemctl reload postfix
+      '';
     };
   };
 }
