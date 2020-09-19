@@ -18,6 +18,14 @@ let
           SMTP server to forward incomming mails for this domain to
         '';
       };
+      address_verify = mkOption {
+        type = types.str;
+        example = "[192.168.1.1]";
+        default = "[${config.backend}]";
+        description = ''
+          SMTP server to use for address verification
+        '';
+      };
       dkim = {
         enable = mkOption {
           type = types.bool;

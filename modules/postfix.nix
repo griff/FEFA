@@ -56,6 +56,9 @@ in {
         ++ (mapAttrsToList (n: d: "${d.backend}") cfg.domains)
         ++ cfg.relays;
 
+      mapFiles."address_verify_transport" = pkgs.writeText "address_verify_transport"
+        (concatStringsSep "\n"
+          (mapAttrsToList (n: d: "${d.domain} smtp:${d.address_verify}") cfg.domains));
       mapFiles."header_checks_outgoing" = pkgs.writeText "header_checks_outgoing" checksOutgoing;
       mapFiles."header_checks_incoming" = pkgs.writeText "header_checks_incoming" checksIncoming;
       mapFiles."tls_policy" = pkgs.writeText "tls_policy"
@@ -72,6 +75,8 @@ in {
         #debug_peer_list = "192.168.10.1";
         # Disable Chunking/BDAT
         smtpd_discard_ehlo_keywords = mkIf (!cfg.enableChunking) "chunking";
+
+        address_verify_transport_maps = [ "hash:/etc/postfix/address_verify_transport" ];
 
         msa_cleanup_service_name = "msa_cleanup";
         msa_header_checks = "pcre:/etc/postfix/msa_header_checks";
