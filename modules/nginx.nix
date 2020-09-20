@@ -28,6 +28,7 @@ in {
       keyType = "rsa4096";
     };
     security.acme.certs."${cfg.fqdn}-ec384" = {
+      user = "nginx";
       domain = cfg.fqdn;
       keyType = "ec384";
       email = cfg.monitorMailAddress;
