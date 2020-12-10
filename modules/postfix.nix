@@ -5,6 +5,11 @@ let
   excludeDirection = dir: lib.filter (x: x.direction != dir) cfg.headerChecks;
   checksIncoming = lib.concatMapStringsSep "\n" (x: "${x.pattern} ${x.action}") (excludeDirection "outgoing");
   checksOutgoing = lib.concatMapStringsSep "\n" (x: "${x.pattern} ${x.action}") (excludeDirection "incoming");
+  msaHeaderChecks = pkgs.writeText "msa_header_checks"
+        (optionalString cfg.enforceTLS (concatStringsSep "\n" (map (subject:
+            "/^Subject: .*\\[${subject}\\].*/ FILTER smtp_notls:"
+          ) cfg.unencryptedSubjects)));
+  msaBodyChecks = pkgs.writeText "msa_body_checks" "";
 in {
   config = mkIf cfg.enable {
     networking.firewall.allowedTCPPorts = [ 25 587 ];
@@ -41,11 +46,6 @@ in {
           maxproc = 0;
         };
       };
-      mapFiles."msa_body_checks" = pkgs.writeText "msa_body_checks" "";
-      mapFiles."msa_header_checks" = pkgs.writeText "msa_header_checks"
-        (optionalString cfg.enforceTLS (concatStringsSep "\n" (map (subject:
-            "/^Subject: .*\[${subject}\].*/ FILTER smtp_notls:"
-          ) cfg.unencryptedSubjects)));
       setSendmail = true;
       hostname = cfg.fqdn;
       destination = [
@@ -79,8 +79,8 @@ in {
         address_verify_transport_maps = [ "hash:/etc/postfix/address_verify_transport" ];
 
         msa_cleanup_service_name = "msa_cleanup";
-        msa_header_checks = "pcre:/etc/postfix/msa_header_checks";
-        msa_body_checks = "pcre:/etc/postfix/msa_body_checks";
+        msa_header_checks = "pcre:${msaHeaderChecks}";
+        msa_body_checks = "pcre:${msaBodyChecks}";
 
         # TLS settings, inspired by https://github.com/jeaye/nix-files
         # Submission by mail clients is handled in submissionOptions
@@ -95,7 +95,7 @@ in {
         smtp_tls_loglevel = "1";
 
         smtp_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
-        smtpd_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
+        #smtpd_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
         smtpd_tls_chain_files = [
           "/var/lib/acme/${cfg.fqdn}/full.pem"
           "/var/lib/acme/${cfg.fqdn}-ec384/full.pem"
@@ -122,6 +122,7 @@ in {
 
         delay_warning_time = "1h";
         maximal_queue_lifetime = "1d";
+        bounce_queue_lifetime = "1d";
 
         local_recipient_maps = "$alias_maps";
 
@@ -137,10 +138,11 @@ in {
         smtpd_relay_restrictions = [
           "reject_non_fqdn_recipient"
           "reject_unknown_recipient_domain"
-          "permit_mynetworks"
+        ] ++ (lib.optional (!cfg.enforceTLS) "permit_mynetworks") ++ [
           "permit_sasl_authenticated"
           "reject_unauth_destination"
         ];
+        # (lib.optional !cfg.enforceTLS "permit_mynetworks") ++
         smtpd_client_restrictions = [
           "permit_mynetworks"
           "permit_sasl_authenticated"
@@ -183,6 +185,7 @@ in {
         #smtpd_sasl_security_options = "noanonymous,noplaintext";
         #smtpd_sasl_tls_security_options = "noanonymous";
         smtpd_client_restrictions = "permit_mynetworks,permit_sasl_authenticated,reject";
+        smtpd_relay_restrictions = "reject_non_fqdn_recipient,reject_unknown_recipient_domain,permit_mynetworks,permit_sasl_authenticated,permit_sasl_authenticated,reject_unauth_destination";
         #milter_macro_daemon_name = "ORIGINATING";
         cleanup_service_name = "$msa_cleanup_service_name";
       };
