@@ -7,12 +7,16 @@ let
   checksOutgoing = lib.concatMapStringsSep "\n" (x: "${x.pattern} ${x.action}") (excludeDirection "incoming");
   msaHeaderChecks = pkgs.writeText "msa_header_checks"
         (optionalString cfg.enforceTLS (concatStringsSep "\n" (map (subject:
-            "/^Subject: .*\\[${subject}\\].*/ FILTER smtp_notls:"
+            "/^X-AllowNoTLS: [ ]*yes$/ FILTER smtp_notls:"
           ) cfg.unencryptedSubjects)));
   msaBodyChecks = pkgs.writeText "msa_body_checks" "";
 in {
   config = mkIf cfg.enable {
     networking.firewall.allowedTCPPorts = [ 25 587 ];
+    services.subjectmilter = {
+      enable = cfg.enforceTLS;
+      unencryptedSubjects = cfg.unencryptedSubjects;
+    };
     services.postfix = {
       enable = true;
       enableHeaderChecks = true;
@@ -28,6 +32,7 @@ in {
           maxproc = 0;
           args = [
             "-o" "header_checks=$msa_header_checks"
+            "-o" "milter_header_checks=$msa_milter_header_checks"
             "-o" "body_checks=$msa_body_checks"
           ];
         };
@@ -80,6 +85,7 @@ in {
 
         msa_cleanup_service_name = "msa_cleanup";
         msa_header_checks = "pcre:${msaHeaderChecks}";
+        msa_milter_header_checks = "pcre:${msaHeaderChecks}";
         msa_body_checks = "pcre:${msaBodyChecks}";
 
         # TLS settings, inspired by https://github.com/jeaye/nix-files

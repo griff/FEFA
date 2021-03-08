@@ -10,5 +10,6 @@
     ./postfix.nix
     ./redis.nix
     ./rspamd.nix
+    ./subjectmilter.nix
   ];
 }
