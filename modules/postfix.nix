@@ -61,9 +61,9 @@ in {
         ++ (mapAttrsToList (n: d: "${d.backend}") cfg.domains)
         ++ cfg.relays;
 
-      mapFiles."address_verify_transport" = pkgs.writeText "address_verify_transport"
+      mapFiles."address_verify_transport" = mkIf cfg.enableAddressVerification (pkgs.writeText "address_verify_transport"
         (concatStringsSep "\n"
-          (mapAttrsToList (n: d: "${d.domain} smtp:${d.address_verify}") cfg.domains));
+          (mapAttrsToList (n: d: "${d.domain} smtp:${d.address_verify}") cfg.domains)));
       mapFiles."header_checks_outgoing" = pkgs.writeText "header_checks_outgoing" checksOutgoing;
       mapFiles."header_checks_incoming" = pkgs.writeText "header_checks_incoming" checksIncoming;
       mapFiles."tls_policy" = pkgs.writeText "tls_policy"
@@ -81,7 +81,7 @@ in {
         # Disable Chunking/BDAT
         smtpd_discard_ehlo_keywords = mkIf (!cfg.enableChunking) "chunking";
 
-        address_verify_transport_maps = [ "hash:/etc/postfix/address_verify_transport" ];
+        address_verify_transport_maps = mkIf cfg.enableAddressVerification [ "hash:/etc/postfix/address_verify_transport" ];
 
         msa_cleanup_service_name = "msa_cleanup";
         msa_header_checks = "pcre:${msaHeaderChecks}";

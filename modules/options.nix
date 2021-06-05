@@ -19,7 +19,7 @@ let
         '';
       };
       address_verify = mkOption {
-        type = types.str;
+        type = types.nullOr types.str;
         example = "[192.168.1.1]";
         default = "[${config.backend}]";
         description = ''
@@ -169,6 +169,13 @@ in {
           This is only used when redis is enabled.
         '';
       };
+    };
+    enableAddressVerification = mkOption {
+      type = types.bool;
+      default = any (d: d.address_verify != null) (attrValues cfg.domains);
+      description = ''
+        Enable postfix address verification.
+      '';
     };
     enableChunking = mkOption {
       type = types.bool;
