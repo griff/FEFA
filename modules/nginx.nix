@@ -2,8 +2,9 @@
 with lib;
 let
   cfg = config.fefa;
+  ncfg = config.services.nginx;
 in {
-  config = mkIf cfg.enable {
+  config = mkIf (cfg.enable && ((cfg.rspamd.enable && cfg.rspamd.enableWebUI) || cfg.tlsProvider == "acme")) {
     networking.firewall.allowedTCPPorts = [ 80 443 ];
     services.nginx = {
       enable = true;
@@ -26,9 +27,10 @@ in {
         systemctl reload postfix
       '';
       keyType = "rsa4096";
+      #extraLegoRunFlags = [ "--preferred-chain" "ISRG Root X1" ];
     };
-    security.acme.certs."${cfg.fqdn}-ec384" = {
-      user = "nginx";
+    security.acme.certs."${cfg.fqdn}-ec384" = mkIf (cfg.tlsProvider == "acme") {
+      group = ncfg.group;
       domain = cfg.fqdn;
       keyType = "ec384";
       email = cfg.monitorMailAddress;
@@ -36,6 +38,7 @@ in {
       postRun = ''
         systemctl reload postfix
       '';
+      #extraLegoRunFlags = [ "--preferred-chain" "ISRG Root X1" ];
     };
   };
 }

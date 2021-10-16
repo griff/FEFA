@@ -54,6 +54,22 @@ in {
       '';
     };
 
+    tlsProvider = mkOption {
+      type = types.enum ["acme" "provided"];
+      default = "acme";
+      example = "provided";
+      description = ''
+        How TLS certificates are provisioned
+      '';
+    };
+    tlsChainFiles = mkOption {
+      type = types.listOf types.path;
+      example = [ /etc/fefa/tls-chain.pem ];
+      description = ''
+        Paths to files containing TLS certificate chains.
+      '';
+    };
+
     debug = mkOption {
       type = types.bool;
       default = false;
@@ -73,7 +89,6 @@ in {
     fqdn = mkOption {
       type = types.str;
       example = "mail.example.com";
-      default = config.networking.hostName;
       description = ''
         The domain the MX record points to and hostname needs not be listed in
         domains. Used by Postfix and ACME.
@@ -243,5 +258,14 @@ in {
       '';
     };
   };
+  config.fefa.fqdn = mkIf cfg.enable (mkDefault
+    (if hasInfix "." config.networking.hostName
+    then "${config.networking.hostName}"
+    else "${config.networking.hostName}.${config.networking.domain}"));
   config.fefa.localMailRecipient = mkIf cfg.enable (mkDefault cfg.monitorMailAddress);
+  config.fefa.tlsChainFiles = mkIf (cfg.enable && cfg.tlsProvider == "acme")
+    (mkDefault [
+      "/var/lib/acme/${cfg.fqdn}/full.pem"
+      "/var/lib/acme/${cfg.fqdn}-ec384/full.pem"
+    ]);
 }

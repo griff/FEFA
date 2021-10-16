@@ -40,20 +40,6 @@ in
     services.unbound = mkIf cfg.localDnsResolver {
       enable = true;
       forwardAddresses = mkIf (cfg.dnsForwarder != "") [cfg.dnsForwarder];
-      #extraConfig = ''
-      #  server:
-      #    val-permissive-mode: yes
-      #'';
-      extraConfig = ''
-        remote-control:
-          control-enable: "yes"
-          server-key-file: ${stateDir}/unbound_server.key
-          server-cert-file: ${stateDir}/unbound_server.pem
-          control-key-file: ${stateDir}/unbound_control.key
-          control-cert-file: ${stateDir}/unbound_control.pem
-          control-port: 8953
-          control-interface: 127.0.0.1
-      '';
     };
     networking.nameservers = if cfg.localDnsResolver
       then ["127.0.0.1"]

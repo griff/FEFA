@@ -2,6 +2,8 @@
 with lib;
 let
   cfg = config.fefa;
+  postfixCfg = config.services.postfix;
+  rspamdCfg = config.services.rspamd;
   dkimDomains = filterAttrs (n: d: d.dkim.enable) cfg.domains;
   dkimConfig = mapAttrsToList (name: d: ''
     domain {
@@ -94,8 +96,6 @@ in {
         type = "rspamd_proxy";
         bindSockets = [{
           socket = "/run/rspamd/rspamd-milter.sock";
-          owner = "rspamd";
-          group = "postfix";
           mode = "0660";
         }];
         count = 1; # Do not spawn too many processes of this type
@@ -143,5 +143,6 @@ in {
       smtpd_milters = [ "unix:/run/rspamd/rspamd-milter.sock" ];
       non_smtpd_milters = [ "unix:/run/rspamd/rspamd-milter.sock" ];
     };
+    users.users.${postfixCfg.user}.extraGroups = [ rspamdCfg.group ];
   };
 }
