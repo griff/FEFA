@@ -5,6 +5,11 @@ let
   stateDir = "/var/lib/unbound";
 in {
   config = mkIf (cfg.enable && cfg.localDnsResolver) {
+      #extraConfig = ''
+      #  server:
+      #    val-permissive-mode: yes
+      #'';
+
     services.unbound.extraConfig = ''
       remote-control:
         control-enable: "yes"
