@@ -2,8 +2,6 @@
 with lib;
 let
   cfg = config.fefa;
-  postfixCfg = config.services.postfix;
-  rspamdCfg = config.services.rspamd;
 in {
   config = mkIf (cfg.enable && cfg.rspamd.enableRedis) {
     services.redis = {

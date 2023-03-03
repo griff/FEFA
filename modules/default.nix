@@ -8,7 +8,6 @@
     ./options.nix
     ./packages.nix
     ./postfix.nix
-    ./redis.nix
     ./rspamd.nix
     ./subjectmilter.nix
   ];
