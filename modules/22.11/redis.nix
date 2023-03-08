@@ -4,9 +4,16 @@ let
   cfg = config.fefa;
 in {
   config = mkIf (cfg.enable && cfg.rspamd.enableRedis) {
-    services.redis.servers.default = {
+    services.redis.servers.fefa = {
       enable = true;
-      bind = "127.0.0.1";
     };
+    users.groups."redis-fefa".members = [ "rspamd" ];
+    systemd.services.rspamd = {
+      after = [ "redis-fefa.service" ];
+      requires = [ "redis-fefa.service" ];
+    };
+    services.rspamd.locals."redis.conf".text = ''
+      servers = "/run/redis-fefa/redis.sock";
+    '';
   };
 }

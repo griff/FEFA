@@ -54,10 +54,6 @@ in {
             use_esld = false;
           '' + (concatStringsSep "\n" dkimConfig);
         };
-        "redis.conf" = mkIf cfg.rspamd.enableRedis { text = ''
-            servers = "127.0.0.1";
-          '';
-        };
         "milter_headers.conf".text = ''
           extended_spam_headers = true;
         '';
@@ -132,8 +128,6 @@ in {
       '' + (concatStringsSep "\n" dkimCreateKeys) + ''
         chown -R rspamd:rspamd /var/lib/rspamd/dkim
       ''));
-      after = mkIf cfg.rspamd.enableRedis [ "redis.service" ];
-      requires = mkIf cfg.rspamd.enableRedis [ "redis.service" ];
     };
     systemd.services.postfix = {
       after = [ "rspamd.service" ];
